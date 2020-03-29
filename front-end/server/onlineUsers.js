@@ -13,8 +13,9 @@ exports.findUserByAlias = (alias) => onlineUsers.find((user) => user.alias === a
 
 exports.findUserBySocketId = (socketId) => onlineUsers.find((user) => user.socketId === socketId );
 
-exports.removeUser = (alias) =>{
-  const index = onlineUsers.findIndex((user) => user.alias === alias);
+exports.getOnlineUsers =() => onlineUsers;
 
+exports.removeUser = (socketId) =>{
+  const index = onlineUsers.findIndex((user) => user.socketId === socketId);
   if(index !== -1) return onlineUsers.splice(index, 1)[0];
 }

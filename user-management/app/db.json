@@ -7,6 +7,6 @@
   {
     "alias":"user2",
     "password":"sdklgjaskbjdgalsnghr",
-    "friend":["user1", "user3"]
+    "friends":["user1", "user3"]
   }
 ]
