@@ -41,7 +41,7 @@ const Chat = ({location}) => {
               console.log (res);
               console.log ("friends of user " + user + ": "+ res.body.friends);
               setFriends(res.body.friends);
-            const onlineFriends = _.intersection(res.body.friends,
+              const onlineFriends = _.intersection(res.body.friends,
                 _.map(onlineUsers, "alias"));
               console.log ("online friend now: "+ onlineFriends);
               setOnlineFriendsList(onlineFriends);
@@ -89,7 +89,11 @@ const handleMessage = (event) => {
     console.log ("I'm user "+ user + " sending to " + sendMessageTo);
     const messageData = { message:message,toUsers:sendMessageTo};
     console.log ("I'm user "+ user +" sending message " + JSON.stringify(messageData));
-    socket.emit('sendMessage', messageData, () => setMessage(''));
+
+    socket.emit('sendMessage', messageData, () => {
+
+      setMessageList(messageList => [ ...messageList, {user:user, text:messageData.message} ]);
+      setMessage('')});
   }
 };
 

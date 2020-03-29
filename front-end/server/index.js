@@ -18,11 +18,11 @@ io.on('connection', (socket) => {
   socket.on('sendMessage', (messageData, callback) => {
     const alias =messageData.toUsers;
     console.log ("send message to user " + alias);
-    const socket = users.findUserByAlias(alias).socketId;
+    const socket = users.findUserByAlias(alias);
     if (!socket){
-      //error
+      callback("there is no socket for that user")
     }
-    io.to(socket).emit('message', {user:alias, text:messageData.message});
+    io.to(socket.socketId).emit('message', {user:alias, text:messageData.message});
     callback();
   });
 
