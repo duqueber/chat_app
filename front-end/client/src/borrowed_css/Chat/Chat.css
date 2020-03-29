@@ -10,11 +10,23 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  background: #FFFFFF;
+  background: green;
   border-radius: 8px;
   height: 60%;
   width: 35%;
 }
+
+.innerContainer{
+    background:yellow;
+    height:100%;
+  }
+  .inner {
+    display: flex;
+    justify-content: space-between;
+    background: blue;
+    border-radius: 8px;
+    height: 100%;
+  }
 
 @media (min-width: 320px) and (max-width: 480px) {
   .outerContainer {

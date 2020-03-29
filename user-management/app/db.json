@@ -1,0 +1,12 @@
+[
+  {
+    "alias":"user1",
+    "password":"klsadhfsbakhrfd",
+    "friends":["user2", "user3"]
+  },
+  {
+    "alias":"user2",
+    "password":"sdklgjaskbjdgalsnghr",
+    "friend":["user1", "user3"]
+  }
+]

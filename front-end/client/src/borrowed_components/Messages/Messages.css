@@ -1,4 +1,6 @@
 .messages {
+  background:purple;
+  width:70%;
   padding: 5% 0;
   overflow: auto;
   flex: auto;
