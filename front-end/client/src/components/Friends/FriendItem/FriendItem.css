@@ -1,0 +1,14 @@
+.clicked{
+   display: flex;
+   align-items: center;
+   font-family: Helvetica;
+   background:gray;
+   letter-spacing: 0.3px;
+}
+
+.none{
+  display: flex;
+  align-items: center;
+  font-family: Helvetica;
+  letter-spacing: 0.3px;
+}
