@@ -20,6 +20,7 @@ const Chat = ({location}) => {
   const [onlineFriendsList, setOnlineFriendsList] = useState([]);
   const [friends, setFriends]= useState([]);
   const [sendMessageTo, setSendMessageTo] = useState('');
+  const [rooms, setRooms]=useState([]);
 
   const ENDPOINT = 'localhost:5000';
   const USER_URL = 'http://localhost:5020/api/v1/user';
@@ -32,7 +33,7 @@ const Chat = ({location}) => {
           if (error){
             alert(error);
           }
-          console.log (onlineUsers);
+          console.log ("from join event ");
           request
             .get(USER_URL)
             .query({user: user})
@@ -51,6 +52,18 @@ const Chat = ({location}) => {
             });
       });
 
+      socket.on('userHasJoined', onlineUsers => {
+          handleUserHasJoined(user, onlineUsers);
+        });
+
+        socket.on('message', message => {
+          handleOnMessage(message);
+        });
+
+          socket.on('createdRoom', id =>{
+              socket.emit('joinRoom', id);
+          });
+
       //unmount
       return () => {
         socket.emit('disconnect');
@@ -59,40 +72,57 @@ const Chat = ({location}) => {
       }
   }, [ENDPOINT, location.search]);
 
-  useEffect(() => {
-    console.log ("userhasJoined " + user);
-      socket.on('userHasJoined', onlineUsers => {
-         console.log ("friends "+ friends);
-          const onlineFriends = _.intersection(friends,
-              _.map(onlineUsers, "alias"));
-            console.log ("online friend now: "+ onlineFriends);
-            setOnlineFriendsList(onlineFriends);
-          });
+  // useEffect(() => {
+  //   console.log ("userhasJoined ");
+  //     socket.on('userHasJoined', onlineUsers => {
+  //        handleUserHasJoined(onlineUsers);
+  //         });
+  //
+  //     }, [onlineFriendsList, friends]);
 
-      }, [onlineFriendsList, friends]);
+useEffect(() => {
+  console.log ("try to create a room with user "+sendMessageTo);
+  if (sendMessageTo){
+    var data= {sendMessageTo, user};
+    socket.emit('createRoom', data);
+  }
+}, [sendMessageTo]);
 
-  useEffect(() => {
-      socket.on('message', message => {
-        setMessageList(messageList => [ ...messageList, message ]);
-      });
-  }, [messageList]);
- //added argument: if present, method called when element changes
 
- useEffect(() =>{
+// added argument: if present, method called when element changes
+const handleUserHasJoined = (user, onlineUsers) =>{
+  request
+    .get(USER_URL)
+    .query({user: user})
+    .then(res => {
+      console.log ("friends of user " + user + ": "+ res.body.friends);
+      setFriends(res.body.friends);
+      const onlineFriends = _.intersection(res.body.friends,
+        _.map(onlineUsers, "alias"));
+      console.log ("online friend now: "+ onlineFriends);
+      setOnlineFriendsList(onlineFriends);
+     })
+    .catch(err => {
+      alert ("Error retrieving user");
+    });
+}
 
- }, []);
+const handleOnMessage = (message) => {
+  console.log ("on message " + JSON.stringify(message));
+  setMessageList(messageList => [ ...messageList, message ]);
+}
 
 const handleMessage = (event) => {
   event.preventDefault();
 
   if(message){
     console.log ("I'm user "+ user + " sending to " + sendMessageTo);
-    const messageData = { message:message,toUsers:sendMessageTo};
+    const messageData = { message:message,toUsers:sendMessageTo,fromUser:user};
     console.log ("I'm user "+ user +" sending message " + JSON.stringify(messageData));
 
     socket.emit('sendMessage', messageData, () => {
-
-      setMessageList(messageList => [ ...messageList, {user:user, text:messageData.message} ]);
+      console.log ("user from sendMsg " +user);
+      //setMessageList(messageList => [ ...messageList, {user:user, text:messageData.message} ]);
       setMessage('')});
   }
 };

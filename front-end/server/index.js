@@ -3,6 +3,7 @@ const server = require ('http').Server(app);
 const io = require ('socket.io')(server);
 const router = require ('./router');
 const users = require ('./onlineUsers');
+const rooms = require ('./rooms');
 
 const PORT = process.env.PORT || 5000;
 
@@ -12,18 +13,53 @@ io.on('connection', (socket) => {
   socket.on('join', ({ user }, callback)=>{
     const {error, userObj} = users.addUser (user, socket.id);
     if (error) return callback(error);
+    onlineUsers = users.getOnlineUsers();
+    console.log ("get online users from on join " + JSON.stringify(onlineUsers));
     socket.broadcast.emit('userHasJoined', users.getOnlineUsers());
     callback(null, users.getOnlineUsers());
   });
+
   socket.on('sendMessage', (messageData, callback) => {
     const alias =messageData.toUsers;
-    console.log ("send message to user " + alias);
-    const socket = users.findUserByAlias(alias);
-    if (!socket){
-      callback("there is no socket for that user")
-    }
-    io.to(socket.socketId).emit('message', {user:alias, text:messageData.message});
+    const members = [alias, messageData.fromUser];
+    console.log ("find room for members "+ members )
+    const room = rooms.findRoomByMembers([alias, messageData.fromUser])
+    //assume that there is a room, if created after clicking
+    console.log ("send message to room "+ JSON.stringify(room));
+    io.to(room.id).emit('message', {user:messageData.fromUser, text:messageData.message});
+
+    // const socket = users.findUserByAlias(alias);
+    // if (!socket){
+    //   return callback("there is no socket for that user")
+    // }
+      // socketId = socket.socketId;
+    // io.to(`${socketId}`).emit('message', {user:messageData.fromUser, text:messageData.message});
     callback();
+  });
+
+  socket.on('createRoom', data =>{
+    const members = [data.sendMessageTo, data.user];
+      if (!rooms.findRoomByMembers(members)){
+        // probably need a uuid, something that avoids duplicates. Using random for simplicity
+        const id =Math.floor(Math.random() * 1000);
+        rooms.addRoom(id, members);
+        console.log (data.user + " joins "+ id);
+        socket.join(id);
+        const socketOfOther = users.findUserByAlias(data.sendMessageTo);
+
+        if (socketOfOther){
+          console.log ("other socket "+ JSON.stringify(socketOfOther));
+          socketId=socketOfOther.socketId;
+          io.to(`${socketId}`).emit('createdRoom', id);
+        }else {
+          console.log ("error joining room");
+        }
+    }
+  });
+
+  socket.on('joinRoom', id =>{
+      console.log ("joined room "+ id + " for socket "+ socket.id);
+      socket.join(id);
   });
 
 

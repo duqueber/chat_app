@@ -10,6 +10,7 @@ const Message = ({ message: { text, user }, name }) => {
   const trimmedName = name.trim().toLowerCase();
 
   if(user === trimmedName) {
+    console.log("is sent by current user "+ name);
     isSentByCurrentUser = true;
   }
 
