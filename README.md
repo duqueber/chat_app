@@ -48,7 +48,12 @@ npm start
 3. Click on "user2" in tab1, type a message and click send. The message should appear on tab1 and tab2. 
 4. From tab2, click on "user1", type a message and click send. The message should appear on tab2 and tab1.
 
-### Design
+### Design and implementation
+
+#### Flow
+- "user1" joins NatChat and informs other users. Other users request user-management to retrieve their friends lists. If "user1" is a friend, "user1" is added to the right of the screen.
+- "user1" clicks on one of his friends for the first time. This action creates a room and asks his friend to join the same room. A room list is kept in the server side with all its members.
+- "user1" sends a message to his friend. Friend responds to message by clicking "user1." Friend and "user1" have already joined the room, so this action is not required. 
 
 #### UI
 React (personal note: I have limited exposure to UI development. I pretty much make UI changes when backend changes require them. You said not to spend too much time in UI but out of all possible options I had, React is the one I'm most familiar with... However, lots of the issues I spent time with were caused by my inexperience. Also, there are a couple of UI components and css classes I borrowed from a source code base online. I put then in the folders with the label "borrowed");
@@ -77,3 +82,4 @@ I hard-coded the user accounts.
  ### Known bugs
  
   - You can only have a conversation between two users: "user3" cannot be added to the conversation between "user1" and "user3"
+  - Send button is active even when you haven't chosen a user to send a message to.
