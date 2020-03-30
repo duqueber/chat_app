@@ -20,7 +20,6 @@ const Chat = ({location}) => {
   const [onlineFriendsList, setOnlineFriendsList] = useState([]);
   const [friends, setFriends]= useState([]);
   const [sendMessageTo, setSendMessageTo] = useState('');
-  const [rooms, setRooms]=useState([]);
 
   const ENDPOINT = 'localhost:5000';
   const USER_URL = 'http://localhost:5020/api/v1/user';
@@ -39,7 +38,6 @@ const Chat = ({location}) => {
             .query({user: user})
             .then(res => {
               console.log ("online users "+ JSON.stringify(onlineUsers));
-              console.log (res);
               console.log ("friends of user " + user + ": "+ res.body.friends);
               setFriends(res.body.friends);
               const onlineFriends = _.intersection(res.body.friends,
@@ -72,16 +70,8 @@ const Chat = ({location}) => {
       }
   }, [ENDPOINT, location.search]);
 
-  // useEffect(() => {
-  //   console.log ("userhasJoined ");
-  //     socket.on('userHasJoined', onlineUsers => {
-  //        handleUserHasJoined(onlineUsers);
-  //         });
-  //
-  //     }, [onlineFriendsList, friends]);
-
 useEffect(() => {
-  console.log ("try to create a room with user "+sendMessageTo);
+  console.log ("create a room with user "+sendMessageTo);
   if (sendMessageTo){
     var data= {sendMessageTo, user};
     socket.emit('createRoom', data);
@@ -122,7 +112,6 @@ const handleMessage = (event) => {
 
     socket.emit('sendMessage', messageData, () => {
       console.log ("user from sendMsg " +user);
-      //setMessageList(messageList => [ ...messageList, {user:user, text:messageData.message} ]);
       setMessage('')});
   }
 };
