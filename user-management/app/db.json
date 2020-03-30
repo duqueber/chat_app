@@ -8,5 +8,11 @@
     "alias":"user2",
     "password":"sdklgjaskbjdgalsnghr",
     "friends":["user1", "user3"]
+  },
+  {
+    "alias":"user3",
+    "password":"sdklgjaskbjdsafdzdgal",
+    "friends":["user1", "user2"]
   }
+
 ]
