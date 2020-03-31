@@ -83,4 +83,4 @@ I hard-coded the user accounts.
  
   - You can only have a conversation between two users: "user3" cannot be added to the conversation between "user1" and "user3"
   - Send button is active even when you haven't chosen a user to send a message to.
-  - When you refresh the page, there are weird behaviors- if user sends a message, the message does not show up on his screen. 
+  - Issues with the logic when a user leaves a room. If "user1" is sending messages to "user2" and leaves the room, when "user1" comes back and wants to send messages to "user2" sometime, he can't. 
