@@ -4,6 +4,7 @@ const io = require ('socket.io')(server);
 const router = require ('./router');
 const users = require ('./onlineUsers');
 const rooms = require ('./rooms');
+const _ = require ('lodash');
 
 const PORT = process.env.PORT || 5000;
 
@@ -15,7 +16,7 @@ io.on('connection', (socket) => {
     if (error) return callback(error);
     onlineUsers = users.getOnlineUsers();
     console.log ("get online users from on join " + JSON.stringify(onlineUsers));
-    socket.broadcast.emit('userHasJoined', users.getOnlineUsers());
+    socket.broadcast.emit('onlineUsersChanged', users.getOnlineUsers());
     callback(null, users.getOnlineUsers());
   });
 
@@ -62,10 +63,28 @@ io.on('connection', (socket) => {
       socket.join(id);
   });
 
+  socket.on('leaveRoom', roomId =>{
+    console.log("leaving room "+ roomId)
+    socket.leave(roomId);
+  });
+  socket.on('disconnect', () =>{
+    console.log("user has left ");
+    const user = users.findUserBySocketId(socket.id);
+    if (user){
+      users.removeUser(socket.id);
+      socket.broadcast.emit('onlineUsersChanged', users.getOnlineUsers());
+      const rooms_ = rooms.findRoomByMember(user.alias);
+      console.log (JSON.stringify (rooms_));
+    // I'm closing room bc only two members can be in room
+    _.forEach (rooms_, room => {
+        io.to(room.id).emit('userHasLeft', user.alias)
+        io.to(room.id).emit('closeRoom', room.id)
+        rooms.removeRoom(room.id);
+      });
 
-  socket.on('disconnect', () => {
-    console.log("user has left "+ socket.id);
-    const user = users.removeUser(socket.id);
+
+    }
+    //console.log (Object.keys(socket.rooms));
   });
 
 

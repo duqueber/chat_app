@@ -50,9 +50,11 @@ const Chat = ({location}) => {
             });
       });
 
-      socket.on('userHasJoined', onlineUsers => {
-          handleUserHasJoined(user, onlineUsers);
+      socket.on('onlineUsersChanged', onlineUsers => {
+          handleOnlineUsersChanged(user, onlineUsers);
         });
+
+        //socket.on('userHasLeft', )
 
         socket.on('message', message => {
           handleOnMessage(message);
@@ -62,11 +64,21 @@ const Chat = ({location}) => {
               socket.emit('joinRoom', id);
           });
 
+          socket.on('userHasLeft', user =>{
+            console.log ("sendMessageTo " + sendMessageTo);
+            console.log ("user" + user);
+            if (sendMessageTo === user){
+              setSendMessageTo('');
+            }
+          });
+          socket.on('closeRoom', id =>{
+              socket.emit('leaveRoom', id);
+          });
       //unmount
       return () => {
         socket.emit('disconnect');
-
         socket.off();
+
       }
   }, [ENDPOINT, location.search]);
 
@@ -80,7 +92,7 @@ useEffect(() => {
 
 
 // added argument: if present, method called when element changes
-const handleUserHasJoined = (user, onlineUsers) =>{
+const handleOnlineUsersChanged = (user, onlineUsers) =>{
   request
     .get(USER_URL)
     .query({user: user})
@@ -96,6 +108,7 @@ const handleUserHasJoined = (user, onlineUsers) =>{
       alert ("Error retrieving user");
     });
 }
+
 
 const handleOnMessage = (message) => {
   console.log ("on message " + JSON.stringify(message));
